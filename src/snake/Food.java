@@ -1,16 +1,9 @@
 package snake;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import javax.swing.ImageIcon;
-
-/**
- *
- * @author Jelena
- */
 
 public class Food {
 
@@ -21,21 +14,12 @@ public class Food {
     private int h = 20;
 
     private Image image;
-    private int width;
-    private int height;
 
-    Food(int x, int y) {
+    Food() {
 
-        this.x = (int) (Math.random() * 20) * 20;
-        this.y = (int) (Math.random() * 20) * 20;
-        image = new ImageIcon(getClass().getResource("jabuka copy.png")).getImage();
-
-        this.x = (int) (Math.random() * 20) * 20;
-        this.y = (int) (Math.random() * 20) * 20;
-        width = 20;
-        height = 20;
-
-        image = new ImageIcon(getClass().getResource("jabuka copy.png")).getImage();
+        x = (int) (Math.random() * 20) * 20;
+        y = (int) (Math.random() * 20) * 20;
+        image = new ImageIcon(getClass().getResource("apple.png")).getImage();
     }
 
     public int getX() {
@@ -47,7 +31,7 @@ public class Food {
     }
 
     public void draw(Graphics2D g2) {
-        g2.drawImage(image, x, y, width, height, null);
+        g2.drawImage(image, x, y, w, h, null);
     }
 
     public Rectangle2D getBounds() {

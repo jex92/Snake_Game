@@ -27,11 +27,11 @@ public class Frame extends JFrame {
     private JMenuBar initMenu() {
         // Napravimo liniju menija
         JMenuBar menuBar = new JMenuBar();
-
         // Mapravimo meni
         JMenu gameMenu = new JMenu("Game");
 
         // Napravimo stavku za meni
+        JMenuItem help = new JMenuItem("Help");
         JMenuItem newGame = new JMenuItem("New game");
         newGame.addActionListener(new ActionListener() {
 
@@ -40,10 +40,10 @@ public class Frame extends JFrame {
                 board.startGame();
             }
         });
-
+         
         // Dodamo stavku u meni
         gameMenu.add(newGame);
-
+        gameMenu.add(help);
         // Dodamo meni u liniju menija
         menuBar.add(gameMenu);
 

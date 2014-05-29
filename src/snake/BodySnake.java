@@ -16,11 +16,33 @@ public class BodySnake implements GameObject {
 
     LinkedList<Rectangle> snake = new LinkedList();
     int body = 2;
+    int STEP = 3;
+    private int MIN_DX = 20;
+    private int MIN_DY = 20;
+    private final int MAX_DX = 40;
+    private final int MAX_DY = 40;
+
+    private int dx;
+    private int dy;
+
     MovingState state;
     int xHead;
     int yHead;
     int x;
     int y;
+
+    void speedUp() {
+        dx += STEP;
+        dy += STEP;
+
+        if (dx > MAX_DX) {
+            dx = MAX_DX;
+        }
+        if (dy > MAX_DY) {
+            dy = MAX_DY;
+        }
+
+    }
 
     enum MovingState {
 
@@ -87,7 +109,7 @@ public class BodySnake implements GameObject {
             }
 
             if (r.x >= board.PANEL_WIDTH) {
-                board.stopGame("Game Over");
+                board.stopGame();
             }
         }
 
@@ -103,7 +125,7 @@ public class BodySnake implements GameObject {
             }
 
             if (r.x < 0) {
-                board.stopGame("Game Over");
+                board.stopGame();
             }
         }
         if (state == MovingState.MOVING_UP) {
@@ -118,7 +140,7 @@ public class BodySnake implements GameObject {
             }
 
             if (r.y < 0) {
-                board.stopGame("Game Over");
+                board.stopGame();
             }
         } else if (state == MovingState.MOVING_DOWN) {
             Rectangle r = new Rectangle(snake.getFirst()); //Kreiramo novi pravougaonik
@@ -131,7 +153,7 @@ public class BodySnake implements GameObject {
             }
 
             if (r.y >= board.PANEL_HEIGHT) {
-                board.stopGame("Game Over");
+                board.stopGame();
             }
         }
 
@@ -140,5 +162,14 @@ public class BodySnake implements GameObject {
     public Rectangle2D getBoundsHead() {
         return new Rectangle2D.Double(xHead, yHead, s, s);
     }
+
+    void hitItself() {
+        for (int i = 1; i < snake.size(); i++) {
+            if (snake.getFirst().intersects(snake.get(i))) {
+                board.stopGame();
+            }
+        }
+    }
+    
 
 }

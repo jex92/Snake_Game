@@ -14,7 +14,7 @@ public class Food {
     private int h = 20;
 
     private Image image;
-
+    
     Food() {
 
         x = (int) (Math.random() * 20) * 20;
@@ -39,7 +39,10 @@ public class Food {
     }
 
     void newFood() {
+      
         x = (int) (Math.random() * 20) * 20;
         y = (int) (Math.random() * 20) * 20;
-    }
+    
+    
 }
+ }

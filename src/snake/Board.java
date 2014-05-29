@@ -28,49 +28,56 @@ public class Board extends JPanel implements Runnable {
 
     private Image image;
     final Thread runner;
+    
+    int foodEaten;
+    
 
     Boolean inGame;
 
     BodySnake bodysnake;
     Food food;
-
     String message;
+    
 
     public Board() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(BACKGROUND_COLOR);
         setFocusable(true);
+        
         setFont(getFont().deriveFont(Font.BOLD, 18f));
         setDoubleBuffered(true);
-
+        
         inGame = false;
 
         bodysnake = new BodySnake(this);
-
+        
         food = new Food();
+        
 
         addKeyListener(new GameKeyAdapter());
-
+    
         runner = new Thread(this);
         runner.start();
     }
 
     public void startGame() {
+        foodEaten = 0;
         bodysnake = new BodySnake(this);
         inGame = true;
     }
 
-    public void stopGame(String message) {
+    public void stopGame() {
         inGame = false;
-        this.message = message;
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
 
-        Graphics2D g2 = (Graphics2D) g;
-
+        Graphics2D g2 = (Graphics2D) g; 
+        
+        
+            
         if (inGame) {
             // Savjeti pri iscrtavanju
 
@@ -86,7 +93,12 @@ public class Board extends JPanel implements Runnable {
             // Iscrtaj sve objekte
             bodysnake.draw(g2);
             food.draw(g2);
-
+            
+            Font f = new Font("Helvetica", Font.PLAIN, 30);
+            g2.setFont(f);
+            g2.setColor(Color.WHITE);
+            g2.drawString("Score: " + (foodEaten * 10), 10, 30);
+            
             Toolkit.getDefaultToolkit().sync();
 
             // Optimizacija upotrebe RAM-a, 
@@ -94,22 +106,30 @@ public class Board extends JPanel implements Runnable {
         } else {
             image = new ImageIcon(getClass().getResource("background.png")).getImage();
             g2.drawImage(image, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
-
+            
         }
     }
 
     public void update() {
+        
         bodysnake.move();
     }
 
     private void detectCollision() {
+        
 
         if (bodysnake.getBoundsHead().intersects(food.getBounds())) {
             bodysnake.body++;
-            food.newFood();
+              for (int i = 0; i < bodysnake.snake.size(); i++) {
+                if ((bodysnake.snake.get(i).intersects(food.getBounds()))){
+                    food.newFood();
+              }}
+            foodEaten++;
 
         }
-
+        bodysnake.hitItself();
+        if (foodEaten % 5 == 0)
+                bodysnake.speedUp();
     }
 
     @Override
@@ -132,18 +152,20 @@ public class Board extends JPanel implements Runnable {
         @Override
         public void keyPressed(KeyEvent e) {
             int keyCode = e.getKeyCode();
-
-            if (keyCode == KeyEvent.VK_LEFT) {
+          
+            if (keyCode == KeyEvent.VK_LEFT ) {
                 bodysnake.moveLeft();
-            } else if (keyCode == KeyEvent.VK_RIGHT) {
+            } else if (keyCode == KeyEvent.VK_RIGHT ) {
                 bodysnake.moveRight();
-            } else if (keyCode == KeyEvent.VK_UP) {
+            } else if (keyCode == KeyEvent.VK_UP ) {
                 bodysnake.moveUp();
             } else if (keyCode == KeyEvent.VK_DOWN) {
                 bodysnake.moveDown();
-            }
+            } 
+             
+           
         }
-
-    }
-
+        
+   }
 }
+

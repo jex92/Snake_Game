@@ -10,39 +10,21 @@ public class Food {
     private int x;
     private int y;
 
-    private int w = 20;
-    private int h = 20;
+    private final int s = 20;
 
     private Image image;
     
-    Food() {
-
-        x = (int) (Math.random() * 20) * 20;
-        y = (int) (Math.random() * 20) * 20;
+    Food(int x, int y) {
+        this.x = x * s;
+        this.y = y * s;
         image = new ImageIcon(getClass().getResource("apple.png")).getImage();
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
     public void draw(Graphics2D g2) {
-        g2.drawImage(image, x, y, w, h, null);
+        g2.drawImage(image, x, y, s, s, null);
     }
 
     public Rectangle2D getBounds() {
-        return new Rectangle2D.Double(x, y, w, h);
+        return new Rectangle2D.Double(x, y, s, s);
     }
-
-    void newFood() {
-      
-        x = (int) (Math.random() * 20) * 20;
-        y = (int) (Math.random() * 20) * 20;
-    
-    
 }
- }

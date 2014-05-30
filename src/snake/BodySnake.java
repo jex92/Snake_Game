@@ -15,7 +15,7 @@ public class BodySnake implements GameObject {
     public static int s = 20;
 
     LinkedList<Rectangle> snake = new LinkedList();
-    int body = 2;
+    int body;
     int STEP = 3;
     private int MIN_DX = 20;
     private int MIN_DY = 20;
@@ -25,7 +25,9 @@ public class BodySnake implements GameObject {
     private int dx;
     private int dy;
 
-    MovingState state;
+    MovingState realMovingState;
+    MovingState usersLastMovingState;
+    
     int xHead;
     int yHead;
     int x;
@@ -44,12 +46,17 @@ public class BodySnake implements GameObject {
 
     }
 
+    void grow() {
+        body++;
+    }
+
     enum MovingState {
 
         MOVING_LEFT, MOVING_RIGHT, MOVING_UP, MOVING_DOWN
     }
 
     public BodySnake(Board board) {
+        this.body = 2;
         this.board = board;
         x = 160;
         y = 160;
@@ -59,31 +66,24 @@ public class BodySnake implements GameObject {
             Rectangle r = new Rectangle(x, y, s, s);
             snake.add(r);
         }
-        this.state = MovingState.MOVING_RIGHT;
+        this.realMovingState = MovingState.MOVING_RIGHT;
+        this.usersLastMovingState = MovingState.MOVING_RIGHT;
     }
 
     public void moveRight() {
-        if (state != MovingState.MOVING_LEFT) {
-            state = MovingState.MOVING_RIGHT;
-        }
+        usersLastMovingState = MovingState.MOVING_RIGHT;
     }
 
     public void moveLeft() {
-        if (state != MovingState.MOVING_RIGHT) {
-            state = MovingState.MOVING_LEFT;
-        }
+        usersLastMovingState = MovingState.MOVING_LEFT;
     }
 
     public void moveUp() {
-        if (state != MovingState.MOVING_DOWN) {
-            state = MovingState.MOVING_UP;
-        }
+        usersLastMovingState = MovingState.MOVING_UP;
     }
 
     public void moveDown() {
-        if (state != MovingState.MOVING_UP) {
-            state = MovingState.MOVING_DOWN;
-        }
+        usersLastMovingState = MovingState.MOVING_DOWN;
     }
 
     @Override
@@ -98,61 +98,64 @@ public class BodySnake implements GameObject {
     @Override
     public void move() {
 
-        if (state == MovingState.MOVING_RIGHT) {
-            Rectangle r = new Rectangle(snake.getFirst());
-            r.x = r.x + s;
-            xHead = r.x;
-            yHead = r.y;
-            snake.add(0, r);
+        if(realMovingState == MovingState.MOVING_UP && usersLastMovingState != MovingState.MOVING_DOWN ||
+                realMovingState == MovingState.MOVING_DOWN && usersLastMovingState != MovingState.MOVING_UP ||
+                realMovingState == MovingState.MOVING_LEFT && usersLastMovingState != MovingState.MOVING_RIGHT ||
+                realMovingState == MovingState.MOVING_RIGHT && usersLastMovingState != MovingState.MOVING_LEFT)
+            realMovingState = usersLastMovingState;
+        
+        System.out.println(realMovingState.toString() + " " + usersLastMovingState.toString());
+        
+        Rectangle head = new Rectangle(snake.getFirst());
+        
+        if (realMovingState == MovingState.MOVING_RIGHT) {
+            head.x = head.x + s;
+            xHead = head.x;
+            yHead = head.y;
+            snake.add(0, head);
             if (this.snake.size() > body) {
                 snake.removeLast();
             }
 
-            if (r.x >= board.PANEL_WIDTH) {
+            if (head.x >= board.PANEL_WIDTH) {
                 board.stopGame();
             }
-        }
-
-        if (state == MovingState.MOVING_LEFT) {
-            Rectangle r = new Rectangle(snake.getFirst()); //Kreiramo novi pravougaonik
-            r.x = r.x - s;
-            xHead = r.x;
-            yHead = r.y;
-            snake.add(0, r);
-
-            if (this.snake.size() > body) {
-                snake.removeLast();
-            }
-
-            if (r.x < 0) {
-                board.stopGame();
-            }
-        }
-        if (state == MovingState.MOVING_UP) {
-            Rectangle r = new Rectangle(snake.getFirst()); //Kreiramo novi pravougaonik
-            r.y = r.y - s;
-            xHead = r.x;
-            yHead = r.y;
-            snake.add(0, r);
+        } else if (realMovingState == MovingState.MOVING_LEFT) {
+            head.x = head.x - s;
+            xHead = head.x;
+            yHead = head.y;
+            snake.add(0, head);
 
             if (this.snake.size() > body) {
                 snake.removeLast();
             }
 
-            if (r.y < 0) {
+            if (head.x < 0) {
                 board.stopGame();
             }
-        } else if (state == MovingState.MOVING_DOWN) {
-            Rectangle r = new Rectangle(snake.getFirst()); //Kreiramo novi pravougaonik
-            r.y = r.y + s;
-            xHead = r.x;
-            yHead = r.y;
-            snake.add(0, r);
+        } else if (realMovingState == MovingState.MOVING_UP) {
+            head.y = head.y - s;
+            xHead = head.x;
+            yHead = head.y;
+            snake.add(0, head);
+
+            if (this.snake.size() > body) {
+                snake.removeLast();
+            }
+
+            if (head.y < 0) {
+                board.stopGame();
+            }
+        } else if (realMovingState == MovingState.MOVING_DOWN) {
+            head.y = head.y + s;
+            xHead = head.x;
+            yHead = head.y;
+            snake.add(0, head);
             if (this.snake.size() >= body) {
                 snake.removeLast();
             }
 
-            if (r.y >= board.PANEL_HEIGHT) {
+            if (head.y >= board.PANEL_HEIGHT) {
                 board.stopGame();
             }
         }
@@ -170,6 +173,4 @@ public class BodySnake implements GameObject {
             }
         }
     }
-    
-
 }

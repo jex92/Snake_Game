@@ -11,6 +11,7 @@ import java.awt.Toolkit;
 import javax.swing.JPanel;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 import javax.swing.ImageIcon;
 
 public class Board extends JPanel implements Runnable {
@@ -26,12 +27,15 @@ public class Board extends JPanel implements Runnable {
 
     final Color BACKGROUND_COLOR = Color.BLACK;
 
-    private Image image;
+    private ImageIcon grass;
+    private ImageIcon background;
+    
     final Thread runner;
     
     int foodEaten;
     
-
+    Random random;
+    
     Boolean inGame;
 
     BodySnake bodysnake;
@@ -51,8 +55,11 @@ public class Board extends JPanel implements Runnable {
 
         bodysnake = new BodySnake(this);
         
-        food = new Food();
+        grass = new ImageIcon(getClass().getResource("grass.jpg"));
+        background = new ImageIcon(getClass().getResource("background.png"));
         
+        random = new Random();
+        food = new Food(random20(), random20());
 
         addKeyListener(new GameKeyAdapter());
     
@@ -76,8 +83,6 @@ public class Board extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D) g; 
         
-        
-            
         if (inGame) {
             // Savjeti pri iscrtavanju
 
@@ -88,8 +93,7 @@ public class Board extends JPanel implements Runnable {
             g2.drawRect(0, 0, PANEL_WIDTH, PANEL_HEIGHT);
             g2.setColor(Color.BLACK);
 
-            image = new ImageIcon(getClass().getResource("grass.jpg")).getImage();
-            g2.drawImage(image, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
+            g2.drawImage(grass.getImage(), 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
             // Iscrtaj sve objekte
             bodysnake.draw(g2);
             food.draw(g2);
@@ -104,47 +108,58 @@ public class Board extends JPanel implements Runnable {
             // Optimizacija upotrebe RAM-a, 
             g.dispose();
         } else {
-            image = new ImageIcon(getClass().getResource("background.png")).getImage();
-            g2.drawImage(image, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
-            
+            g2.drawImage(background.getImage(), 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
         }
+    }
+    
+    private int random20() {
+        return random.nextInt(20);
     }
 
     public void update() {
-        
         bodysnake.move();
+        
     }
 
     private void detectCollision() {
-        
-
         if (bodysnake.getBoundsHead().intersects(food.getBounds())) {
-            bodysnake.body++;
-              for (int i = 0; i < bodysnake.snake.size(); i++) {
-                if ((bodysnake.snake.get(i).intersects(food.getBounds()))){
-                    food.newFood();
-              }}
+            bodysnake.grow();
+            
+            while(foodIntersectsSnake()) {
+                food = new Food(random20(), random20());
+            }
+            
             foodEaten++;
-
         }
         bodysnake.hitItself();
-        if (foodEaten % 5 == 0)
-                bodysnake.speedUp();
+//        if (foodEaten % 5 == 0) {
+//         
     }
 
     @Override
     public void run() {
         while (true) {
-            update();
-            detectCollision();
-            repaint();
+            if (inGame) {
+                update();
+                detectCollision();
+                repaint();
+            }
 
             try {
                 Thread.sleep(120);
             } catch (InterruptedException ex) {
                 System.out.println(ex.toString());
+            } 
+        }
+    }
+
+    private boolean foodIntersectsSnake() {
+        for (int i = 0; i < bodysnake.snake.size(); i++) {
+            if (bodysnake.snake.get(i).intersects(food.getBounds())) {
+                return true;
             }
         }
+        return false;
     }
 
     class GameKeyAdapter extends KeyAdapter {
@@ -162,8 +177,6 @@ public class Board extends JPanel implements Runnable {
             } else if (keyCode == KeyEvent.VK_DOWN) {
                 bodysnake.moveDown();
             } 
-             
-           
         }
         
    }

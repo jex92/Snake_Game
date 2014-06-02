@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import javax.swing.JPanel;
@@ -29,6 +28,7 @@ public class Board extends JPanel implements Runnable {
 
     private ImageIcon grass;
     private ImageIcon background;
+  
     
     final Thread runner;
     
@@ -41,7 +41,7 @@ public class Board extends JPanel implements Runnable {
     BodySnake bodysnake;
     Food food;
     String message;
-    
+   
 
     public Board() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
@@ -57,6 +57,7 @@ public class Board extends JPanel implements Runnable {
         
         grass = new ImageIcon(getClass().getResource("grass.jpg"));
         background = new ImageIcon(getClass().getResource("background.png"));
+        
         
         random = new Random();
         food = new Food(random20(), random20());
@@ -138,19 +139,38 @@ public class Board extends JPanel implements Runnable {
 
     @Override
     public void run() {
+        
         while (true) {
+            
             if (inGame) {
                 update();
                 detectCollision();
                 repaint();
             }
+            int score = 100;
+            int speed = 150;
+            for (int i = 1; i < foodEaten; i++) {
+                if ((foodEaten * 10) >= score) {
+                    speed = speed - 10;
+                } if (speed <= 0) {
+                    speed = (speed + 10);
+                }
+
+                score += 30;
+            }
+           
 
             try {
-                Thread.sleep(120);
+                
+                Thread.sleep(speed);
+                 
+
             } catch (InterruptedException ex) {
                 System.out.println(ex.toString());
-            } 
+            }
+
         }
+        
     }
 
     private boolean foodIntersectsSnake() {

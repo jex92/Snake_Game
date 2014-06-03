@@ -28,42 +28,44 @@ public class Board extends JPanel implements Runnable {
 
     private ImageIcon grass;
     private ImageIcon background;
-  
-    
+
     final Thread runner;
-    
+
     int foodEaten;
-    
+
     Random random;
-    
+
     Boolean inGame;
 
     BodySnake bodysnake;
     Food food;
     String message;
-   
+    
+    int speed;
 
     public Board() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(BACKGROUND_COLOR);
         setFocusable(true);
-        
+
         setFont(getFont().deriveFont(Font.BOLD, 18f));
         setDoubleBuffered(true);
-        
+
         inGame = false;
+        message = "";
 
         bodysnake = new BodySnake(this);
-        
+
         grass = new ImageIcon(getClass().getResource("grass.jpg"));
         background = new ImageIcon(getClass().getResource("background.png"));
-        
-        
+
         random = new Random();
         food = new Food(random20(), random20());
 
         addKeyListener(new GameKeyAdapter());
-    
+        
+        speed = 150;
+
         runner = new Thread(this);
         runner.start();
     }
@@ -72,18 +74,21 @@ public class Board extends JPanel implements Runnable {
         foodEaten = 0;
         bodysnake = new BodySnake(this);
         inGame = true;
+       
     }
 
-    public void stopGame() {
+    public void stopGame(String message) {
         inGame = false;
+        this.message = ("You scored " + (foodEaten * 10) +" points");
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
 
-        Graphics2D g2 = (Graphics2D) g; 
+        Graphics2D g2 = (Graphics2D) g;
         
+
         if (inGame) {
             // Savjeti pri iscrtavanju
 
@@ -98,79 +103,75 @@ public class Board extends JPanel implements Runnable {
             // Iscrtaj sve objekte
             bodysnake.draw(g2);
             food.draw(g2);
-            
+
             Font f = new Font("Helvetica", Font.PLAIN, 30);
             g2.setFont(f);
             g2.setColor(Color.WHITE);
             g2.drawString("Score: " + (foodEaten * 10), 10, 30);
-            
+        
+
             Toolkit.getDefaultToolkit().sync();
 
             // Optimizacija upotrebe RAM-a, 
             g.dispose();
         } else {
             g2.drawImage(background.getImage(), 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
+            Font f = new Font("Helvetica", Font.PLAIN, 30);
+            g2.setFont(f);
+            int messageWidth = getFontMetrics(getFont()).stringWidth(message);
+            g2.drawString(message, 10, 30);
+            
         }
     }
-    
+
     private int random20() {
         return random.nextInt(20);
     }
 
     public void update() {
         bodysnake.move();
-        
+
     }
 
     private void detectCollision() {
         if (bodysnake.getBoundsHead().intersects(food.getBounds())) {
             bodysnake.grow();
-            
-            while(foodIntersectsSnake()) {
+
+            while (foodIntersectsSnake()) {
                 food = new Food(random20(), random20());
             }
-            
+
             foodEaten++;
+            if (foodEaten % 5 == 0 && speed > 50)
+            {
+                speed = speed - 20;
+            }
         }
         bodysnake.hitItself();
-//        if (foodEaten % 5 == 0) {
-//         
+      
     }
 
     @Override
     public void run() {
-        
+
         while (true) {
-            
+
             if (inGame) {
                 update();
                 detectCollision();
                 repaint();
-            }
-            int score = 100;
-            int speed = 150;
-            for (int i = 1; i < foodEaten; i++) {
-                if ((foodEaten * 10) >= score) {
-                    speed = speed - 10;
-                } if (speed <= 0) {
-                    speed = (speed + 10);
-                }
-
-                score += 30;
-            }
-           
+            }    
 
             try {
-                
+
                 Thread.sleep(speed);
-                 
 
             } catch (InterruptedException ex) {
                 System.out.println(ex.toString());
             }
 
         }
-        
+
     }
 
     private boolean foodIntersectsSnake() {
@@ -187,18 +188,17 @@ public class Board extends JPanel implements Runnable {
         @Override
         public void keyPressed(KeyEvent e) {
             int keyCode = e.getKeyCode();
-          
-            if (keyCode == KeyEvent.VK_LEFT ) {
+
+            if (keyCode == KeyEvent.VK_LEFT) {
                 bodysnake.moveLeft();
-            } else if (keyCode == KeyEvent.VK_RIGHT ) {
+            } else if (keyCode == KeyEvent.VK_RIGHT) {
                 bodysnake.moveRight();
-            } else if (keyCode == KeyEvent.VK_UP ) {
+            } else if (keyCode == KeyEvent.VK_UP) {
                 bodysnake.moveUp();
             } else if (keyCode == KeyEvent.VK_DOWN) {
                 bodysnake.moveDown();
-            } 
+            }
         }
-        
-   }
-}
 
+    }
+}

@@ -104,7 +104,6 @@ public class BodySnake implements GameObject {
                 realMovingState == MovingState.MOVING_RIGHT && usersLastMovingState != MovingState.MOVING_LEFT)
             realMovingState = usersLastMovingState;
         
-        System.out.println(realMovingState.toString() + " " + usersLastMovingState.toString());
         
         Rectangle head = new Rectangle(snake.getFirst());
         
@@ -118,7 +117,7 @@ public class BodySnake implements GameObject {
             }
 
             if (head.x >= board.PANEL_WIDTH) {
-                board.stopGame();
+                board.stopGame("Game over");
             }
         } else if (realMovingState == MovingState.MOVING_LEFT) {
             head.x = head.x - s;
@@ -131,7 +130,7 @@ public class BodySnake implements GameObject {
             }
 
             if (head.x < 0) {
-                board.stopGame();
+                board.stopGame("Game over");
             }
         } else if (realMovingState == MovingState.MOVING_UP) {
             head.y = head.y - s;
@@ -144,7 +143,7 @@ public class BodySnake implements GameObject {
             }
 
             if (head.y < 0) {
-                board.stopGame();
+                board.stopGame("Game over");
             }
         } else if (realMovingState == MovingState.MOVING_DOWN) {
             head.y = head.y + s;
@@ -156,7 +155,7 @@ public class BodySnake implements GameObject {
             }
 
             if (head.y >= board.PANEL_HEIGHT) {
-                board.stopGame();
+                board.stopGame("Game over");
             }
         }
 
@@ -169,7 +168,7 @@ public class BodySnake implements GameObject {
     void hitItself() {
         for (int i = 1; i < snake.size(); i++) {
             if (snake.getFirst().intersects(snake.get(i))) {
-                board.stopGame();
+                board.stopGame("Game over");
             }
         }
     }

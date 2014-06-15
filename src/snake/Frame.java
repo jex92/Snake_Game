@@ -10,7 +10,7 @@ import javax.swing.JMenuItem;
 public class Frame extends JFrame {
 
     Board board = new Board();
-
+    
     public Frame() {
         add(board);
         setJMenuBar(initMenu());
@@ -33,6 +33,7 @@ public class Frame extends JFrame {
         // Napravimo stavku za meni
         JMenuItem help = new JMenuItem("Help");
         JMenuItem newGame = new JMenuItem("New game");
+        
         newGame.addActionListener(new ActionListener() {
 
             @Override

@@ -10,7 +10,6 @@ public class BodySnake implements GameObject {
 
     private final Board board;
 
-    private final Color fillColor = Color.GREEN;
 
     public static int s = 20;
 
@@ -89,7 +88,7 @@ public class BodySnake implements GameObject {
     @Override
     public void draw(Graphics2D g2) {
         for (int i = 0; i < snake.size(); i++) {
-            g2.setColor(Color.GREEN);
+            g2.setColor(Color.CYAN);
             Rectangle r = snake.get(i);
             g2.fillRect(r.x, r.y, r.width, r.height);
         }
@@ -98,15 +97,15 @@ public class BodySnake implements GameObject {
     @Override
     public void move() {
 
-        if(realMovingState == MovingState.MOVING_UP && usersLastMovingState != MovingState.MOVING_DOWN ||
-                realMovingState == MovingState.MOVING_DOWN && usersLastMovingState != MovingState.MOVING_UP ||
-                realMovingState == MovingState.MOVING_LEFT && usersLastMovingState != MovingState.MOVING_RIGHT ||
-                realMovingState == MovingState.MOVING_RIGHT && usersLastMovingState != MovingState.MOVING_LEFT)
+        if (realMovingState == MovingState.MOVING_UP && usersLastMovingState != MovingState.MOVING_DOWN
+                || realMovingState == MovingState.MOVING_DOWN && usersLastMovingState != MovingState.MOVING_UP
+                || realMovingState == MovingState.MOVING_LEFT && usersLastMovingState != MovingState.MOVING_RIGHT
+                || realMovingState == MovingState.MOVING_RIGHT && usersLastMovingState != MovingState.MOVING_LEFT) {
             realMovingState = usersLastMovingState;
-        
-        
+        }
+
         Rectangle head = new Rectangle(snake.getFirst());
-        
+
         if (realMovingState == MovingState.MOVING_RIGHT) {
             head.x = head.x + s;
             xHead = head.x;
@@ -116,8 +115,8 @@ public class BodySnake implements GameObject {
                 snake.removeLast();
             }
 
-            if (head.x >= board.PANEL_WIDTH) {
-                board.stopGame("Game over");
+            if (head.x >= 600) {
+                head.x = 0;
             }
         } else if (realMovingState == MovingState.MOVING_LEFT) {
             head.x = head.x - s;
@@ -130,7 +129,7 @@ public class BodySnake implements GameObject {
             }
 
             if (head.x < 0) {
-                board.stopGame("Game over");
+                head.x = 600 - s;
             }
         } else if (realMovingState == MovingState.MOVING_UP) {
             head.y = head.y - s;
@@ -143,8 +142,9 @@ public class BodySnake implements GameObject {
             }
 
             if (head.y < 0) {
-                board.stopGame("Game over");
+                head.y = 600 - s;
             }
+
         } else if (realMovingState == MovingState.MOVING_DOWN) {
             head.y = head.y + s;
             xHead = head.x;
@@ -154,9 +154,10 @@ public class BodySnake implements GameObject {
                 snake.removeLast();
             }
 
-            if (head.y >= board.PANEL_HEIGHT) {
-                board.stopGame("Game over");
+            if (head.y >= 600) {
+                head.y = 0;
             }
+
         }
 
     }

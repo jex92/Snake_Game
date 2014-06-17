@@ -10,45 +10,30 @@ public class BodySnake implements GameObject {
 
     private final Board board;
 
-
     public static int s = 20;
 
     LinkedList<Rectangle> snake = new LinkedList();
     int body;
     int STEP = 3;
-    private int MIN_DX = 20;
-    private int MIN_DY = 20;
-    private final int MAX_DX = 40;
-    private final int MAX_DY = 40;
-
-    private int dx;
-    private int dy;
 
     MovingState realMovingState;
     MovingState usersLastMovingState;
-    
+
     int xHead;
     int yHead;
     int x;
     int y;
 
-    void speedUp() {
-        dx += STEP;
-        dy += STEP;
-
-        if (dx > MAX_DX) {
-            dx = MAX_DX;
-        }
-        if (dy > MAX_DY) {
-            dy = MAX_DY;
-        }
-
-    }
-
+    /**
+     * Metoda koja povećava telo zmije za jedan pravougaonik.
+     */
     void grow() {
         body++;
     }
 
+    /**
+     * Posebna vrsta Java klase. Sadrži 4 konstante.
+     */
     enum MovingState {
 
         MOVING_LEFT, MOVING_RIGHT, MOVING_UP, MOVING_DOWN
@@ -69,22 +54,37 @@ public class BodySnake implements GameObject {
         this.usersLastMovingState = MovingState.MOVING_RIGHT;
     }
 
+    /**
+     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_RIGHT;
+     */
     public void moveRight() {
         usersLastMovingState = MovingState.MOVING_RIGHT;
     }
 
+    /**
+     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_LEFT;
+     */
     public void moveLeft() {
         usersLastMovingState = MovingState.MOVING_LEFT;
     }
 
+    /**
+     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_UP;
+     */
     public void moveUp() {
         usersLastMovingState = MovingState.MOVING_UP;
     }
 
+    /**
+     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_DOWN;
+     */
     public void moveDown() {
         usersLastMovingState = MovingState.MOVING_DOWN;
     }
 
+    /**
+     * Metoda koja boji našu zmiju u CYAN (svetlo plavu) boju.
+     */
     @Override
     public void draw(Graphics2D g2) {
         for (int i = 0; i < snake.size(); i++) {
@@ -94,6 +94,12 @@ public class BodySnake implements GameObject {
         }
     }
 
+    /**
+     * Metoda koja ispituje kada može biti realMovingState =
+     * usersLastMovingState. i * Kada je to ispunjeno ispituje se kakav je
+     * status realMovingState * i u zavisnosti od tog stanja implementira se
+     * kretanje zmije.
+     */
     @Override
     public void move() {
 
@@ -162,10 +168,16 @@ public class BodySnake implements GameObject {
 
     }
 
+    /**
+     * Metoda koja vraća pravugaonik koji predstavlja glavu zmije.
+     */
     public Rectangle2D getBoundsHead() {
         return new Rectangle2D.Double(xHead, yHead, s, s);
     }
 
+    /**
+     * Metoda koja ispituje da li je zmija udarila u svoj rep.
+     */
     void hitItself() {
         for (int i = 1; i < snake.size(); i++) {
             if (snake.getFirst().intersects(snake.get(i))) {

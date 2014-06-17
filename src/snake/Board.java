@@ -40,8 +40,10 @@ public class Board extends JPanel implements Runnable {
     BodySnake bodysnake;
     Food food;
     String message;
-    
+
     int speed;
+
+    HelpFrame help = new HelpFrame(this);
 
     public Board() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
@@ -63,31 +65,53 @@ public class Board extends JPanel implements Runnable {
         food = new Food(random20(), random20());
 
         addKeyListener(new GameKeyAdapter());
-        
+
         speed = 150;
 
         runner = new Thread(this);
         runner.start();
     }
 
+    /**
+     * Metoda koja vraća skor koji smo osvojili. Skor je jednak broju pojedenih
+     * jabuka (foodEaten) pomnoženih sa 10.
+     */
+    int getGameScore() {
+        return (foodEaten * 10);
+    }
+
+    /**
+     * Metoda u kojoj postavljamo broj pojedene hrane na 0, zatim
+     * inicijalizujemo inGame = true i pravimo novi objekat klase BodySnake.
+     */
     public void startGame() {
         foodEaten = 0;
         bodysnake = new BodySnake(this);
         inGame = true;
-       
+
     }
 
+    /**
+     * Metoda u kojoj postavljamo inGame = false. Igra se završava i metoda nam
+     * vraća poruku koliko smo bodova osvojili.
+     */
     public void stopGame(String message) {
         inGame = false;
-        this.message = ("You scored " + (foodEaten * 10) +" points");
+        this.message = ("You scored " + getGameScore() + " points");
+
     }
 
+    /**
+     * Metoda koja služi za iscrtavanje i iscrtava jedno ukoliko je inGame =true, 
+     * a drugo ako je inGame = false. Ukoliko je inGame = true iscrtava se
+     * teran, pozadina, objekti u igri, a ukoliko je inGame = false iscrtava se
+     * pozadi i poruka koja nam govori koliko smo bodova osvojili tokom igre.
+     */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
 
         Graphics2D g2 = (Graphics2D) g;
-        
 
         if (inGame) {
             // Savjeti pri iscrtavanju
@@ -107,8 +131,7 @@ public class Board extends JPanel implements Runnable {
             Font f = new Font("Helvetica", Font.PLAIN, 30);
             g2.setFont(f);
             g2.setColor(Color.WHITE);
-            g2.drawString("Score: " + (foodEaten * 10), 10, 30);
-        
+            g2.drawString("Score: " + getGameScore(), 10, 30);
 
             Toolkit.getDefaultToolkit().sync();
 
@@ -120,19 +143,34 @@ public class Board extends JPanel implements Runnable {
             g2.setFont(f);
             int messageWidth = getFontMetrics(getFont()).stringWidth(message);
             g2.drawString(message, 10, 30);
-            
+
         }
     }
 
+    /**
+     * Metoda koja vraća novi slučajan broj u zadatom opsegu od 0 do 19.
+     */
     private int random20() {
         return random.nextInt(20);
     }
 
+    /**
+     * Metoda u kojoj se poziva metoda move() klase BodySnake.
+     */
     public void update() {
         bodysnake.move();
 
     }
 
+    /**
+     * Metoda u kojoj ispitujemo da li je zmija pojela hranu, tj.da li je došlo
+     * do preklapanja zmije i hrane. Ukoliko jeste, zmija raste, broj pojedene
+     * hrane se povećava, a samim tim i skor. Takode, sve dok hrana preseca
+     * zmiju traži se novo random mesto za hranu. U ovoj metodi se vrši
+     * ubrzavanje zmije. Na svaku petu pojedenu jabuku zmija se ubrzava, tj.
+     * speed se smanjuje za 20. Metoda poziva metodu hitItself() klase
+     * BodySnake.
+     */
     private void detectCollision() {
         if (bodysnake.getBoundsHead().intersects(food.getBounds())) {
             bodysnake.grow();
@@ -142,15 +180,18 @@ public class Board extends JPanel implements Runnable {
             }
 
             foodEaten++;
-            if (foodEaten % 5 == 0 && speed > 50)
-            {
+            if (foodEaten % 5 == 0 && speed > 50) {
                 speed = speed - 20;
             }
         }
         bodysnake.hitItself();
-      
+
     }
 
+    /**
+     * Metoda poziva metodu update(), detectCollision() koje smo maločas
+     * opisali, zatim vrši ponovno iscrtavanje.
+     */
     @Override
     public void run() {
 
@@ -160,7 +201,7 @@ public class Board extends JPanel implements Runnable {
                 update();
                 detectCollision();
                 repaint();
-            }    
+            }
 
             try {
 
@@ -174,6 +215,9 @@ public class Board extends JPanel implements Runnable {
 
     }
 
+    /**
+     * Metoda koja provera da li se zmija preseca sa hranom.
+     */
     private boolean foodIntersectsSnake() {
         for (int i = 0; i < bodysnake.snake.size(); i++) {
             if (bodysnake.snake.get(i).intersects(food.getBounds())) {

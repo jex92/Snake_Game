@@ -10,7 +10,7 @@ import javax.swing.JMenuItem;
 public class Frame extends JFrame {
 
     Board board = new Board();
-    
+
     public Frame() {
         add(board);
         setJMenuBar(initMenu());
@@ -24,6 +24,9 @@ public class Frame extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Metoda koja pravi meni u igri sa stavkama New Game i Help.
+     */
     private JMenuBar initMenu() {
         // Napravimo liniju menija
         JMenuBar menuBar = new JMenuBar();
@@ -31,9 +34,9 @@ public class Frame extends JFrame {
         JMenu gameMenu = new JMenu("Game");
 
         // Napravimo stavku za meni
-        JMenuItem help = new JMenuItem("Help");
         JMenuItem newGame = new JMenuItem("New game");
-        
+        JMenuItem Help = new JMenuItem("Help");
+
         newGame.addActionListener(new ActionListener() {
 
             @Override
@@ -41,10 +44,18 @@ public class Frame extends JFrame {
                 board.startGame();
             }
         });
-         
+
+        Help.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.help.setVisible(true);
+            }
+        });
+
         // Dodamo stavku u meni
         gameMenu.add(newGame);
-        gameMenu.add(help);
+        gameMenu.add(Help);
         // Dodamo meni u liniju menija
         menuBar.add(gameMenu);
 

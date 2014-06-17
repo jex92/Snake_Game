@@ -34,7 +34,7 @@ U klasi Board imamo jos i klasu GameKeyAdapter u kojoj se upravljackim tasterima
 
 Klasu Food karakteriše gornja leva tacka na ekranu, izražena kroz x i y vrijednosti, i stranica.
 
-Klasa Frame nasledjuje klasu JFrame. Klasa ima jednu metodu private JMenuBar initMenu() kojom pravi meni igrice.
+Klasa Frame nasledjuje klasu JFrame. Klasa ima jednu metodu private JMenuBar initMenu() koja pravi meni igrice.
 
 Klasa HelpFrame nasleduje klasu JFrame kao i klasa Frame.  
 HelpFrame ima jedan textArea u koji se ispisuje tekst pritiskom na jedan od 4 dugmica tj.labele. U kodu ispisujemo tekst koji želimo da nam piše u TextArea pritiskom na odredeno dugme.

@@ -5,12 +5,12 @@ Hrana (jabuka) se nalazi na boardu na random mestu.
 Zmija može da prolazi kroz zidove, tj. ako udari o jednu stranu boarda, pojavi se na drugoj strani. Ukoliko zmija udari u svoj rep igra je gotova.
 
 Igra sadrži sledeće klase:
-Snake
-BodySnake
-Board
-Food
-Frame
-HelpFrame
+Snake,
+BodySnake,
+Board,
+Food,
+Frame,
+HelpFrame,
 GameObject
 
 Klasa Snake sadrži metodu main.

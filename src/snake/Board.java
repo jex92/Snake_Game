@@ -10,8 +10,18 @@ import java.awt.Toolkit;
 import javax.swing.JPanel;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class Board extends JPanel implements Runnable {
 
@@ -26,8 +36,8 @@ public class Board extends JPanel implements Runnable {
 
     final Color BACKGROUND_COLOR = Color.BLACK;
 
-    private ImageIcon grass;
-    private ImageIcon background;
+    private final ImageIcon grass;
+    private final ImageIcon background;
 
     final Thread runner;
 
@@ -39,12 +49,17 @@ public class Board extends JPanel implements Runnable {
 
     BodySnake bodysnake;
     Food food;
-    String message;
+    HelpFrame help;
 
+    private String playerName;
     int speed;
+    int gameScore = 0;
 
-    HelpFrame help = new HelpFrame(this);
-
+    /**
+     * Podrazumjevani konstruktor. Postavlja veličinu table, boju pozadine i
+     * font, inicijalizuje početni rezultat, te objekte u igri. Inicijalizuje i
+     * pokreće radnu nit.
+     */
     public Board() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(BACKGROUND_COLOR);
@@ -54,30 +69,28 @@ public class Board extends JPanel implements Runnable {
         setDoubleBuffered(true);
 
         inGame = false;
-        message = "";
-
-        bodysnake = new BodySnake(this);
+        speed = 150;
 
         grass = new ImageIcon(getClass().getResource("grass.jpg"));
         background = new ImageIcon(getClass().getResource("background.png"));
 
         random = new Random();
-        food = new Food(random20(), random20());
+        bodysnake = new BodySnake(this);
+        food = new Food(random30(), random30());
+        help = new HelpFrame(this);
 
         addKeyListener(new GameKeyAdapter());
-
-        speed = 150;
 
         runner = new Thread(this);
         runner.start();
     }
 
     /**
-     * Metoda koja vraća skor koji smo osvojili. Skor je jednak broju pojedenih
-     * jabuka (foodEaten) pomnoženih sa 10.
+     * Metoda koja vraća skor koji smo osvojili. Skor se nakon svake pojedene
+     * hrane uvećava za 10.
      */
     int getGameScore() {
-        return (foodEaten * 10);
+        return gameScore;
     }
 
     /**
@@ -92,21 +105,33 @@ public class Board extends JPanel implements Runnable {
     }
 
     /**
-     * Metoda u kojoj postavljamo inGame = false. Igra se završava i metoda nam
-     * vraća poruku koliko smo bodova osvojili.
+     * Metoda u kojoj postavljamo inGame = false. Nakon završetka igre unosimo
+     * svoje ime u JPanelOption message dialog box. Ime zajedno sa postignutim
+     * reziltatom se pamti u listu skoreva u dokumentu results.txt.
      */
-    public void stopGame(String message) {
+    public void stopGame() {
+
+        playerName = JOptionPane.showInputDialog(null, "Please, enter your name:", "You scored " + getGameScore() + " points", JOptionPane.INFORMATION_MESSAGE);
+        try {
+
+            List<String> scores = load("src/snake/results.txt");
+            scores.add(playerName + " - " + getGameScore());
+            save_file("src/snake/results.txt", scores); //igra je sacuvana
+
+        } catch (IOException ex) { //ako ne moze da bude prikazano, objavi gresku
+            System.out.println("Error : " + ex);
+        }
         inGame = false;
-        this.message = ("You scored " + getGameScore() + " points");
 
     }
 
     /**
-     * Metoda koja služi za iscrtavanje i iscrtava jedno ukoliko je inGame =true, 
-     * a drugo ako je inGame = false. Ukoliko je inGame = true iscrtava se
-     * teran, pozadina, objekti u igri, a ukoliko je inGame = false iscrtava se
-     * pozadi i poruka koja nam govori koliko smo bodova osvojili tokom igre.
+     * Metoda koja služi za iscrtavanje i iscrtava jedno ukoliko je inGame
+     * =true, a drugo ako je inGame = false. Ukoliko je inGame = true iscrtava
+     * se teran, pozadina, objekti u igri,tekst koji prati skor, a ukoliko je
+     * inGame = false iscrtava se samo pozadina.
      */
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -141,17 +166,14 @@ public class Board extends JPanel implements Runnable {
             g2.drawImage(background.getImage(), 0, 0, PANEL_WIDTH, PANEL_HEIGHT, null);
             Font f = new Font("Helvetica", Font.PLAIN, 30);
             g2.setFont(f);
-            int messageWidth = getFontMetrics(getFont()).stringWidth(message);
-            g2.drawString(message, 10, 30);
-
         }
     }
 
     /**
-     * Metoda koja vraća novi slučajan broj u zadatom opsegu od 0 do 19.
+     * Metoda koja vraća novi slučajan broj.
      */
-    private int random20() {
-        return random.nextInt(20);
+    private int random30() {
+        return random.nextInt(30);
     }
 
     /**
@@ -165,21 +187,20 @@ public class Board extends JPanel implements Runnable {
     /**
      * Metoda u kojoj ispitujemo da li je zmija pojela hranu, tj.da li je došlo
      * do preklapanja zmije i hrane. Ukoliko jeste, zmija raste, broj pojedene
-     * hrane se povećava, a samim tim i skor. Takode, sve dok hrana preseca
-     * zmiju traži se novo random mesto za hranu. U ovoj metodi se vrši
-     * ubrzavanje zmije. Na svaku petu pojedenu jabuku zmija se ubrzava, tj.
-     * speed se smanjuje za 20. Metoda poziva metodu hitItself() klase
-     * BodySnake.
+     * hrane se povećava, kao i skor. Takode, sve dok hrana preseca zmiju traži
+     * se novo random mesto za hranu. U ovoj metodi se vrši ubrzavanje zmije. Na
+     * svaku petu pojedenu jabuku zmija se ubrzava, tj. speed se smanjuje za 20.
+     * Metoda poziva metodu hitItself() klase BodySnake.
      */
     private void detectCollision() {
         if (bodysnake.getBoundsHead().intersects(food.getBounds())) {
             bodysnake.grow();
 
             while (foodIntersectsSnake()) {
-                food = new Food(random20(), random20());
+                food = new Food(random30(), random30());
             }
-
             foodEaten++;
+            gameScore += 10;
             if (foodEaten % 5 == 0 && speed > 50) {
                 speed = speed - 20;
             }
@@ -225,6 +246,95 @@ public class Board extends JPanel implements Runnable {
             }
         }
         return false;
+    }
+
+    //Čuvanje razultata u datoteci
+    private void save_file(String name_fale, List<String> scores) throws IOException {
+
+        File file = new File(name_fale);
+        if (!file.exists()) { //Ako ne postoji datoteka, kreirati je
+            file.createNewFile();
+        }
+        try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
+            for (String score : scores) {
+                writer.println(score);
+            }
+        }
+    }
+
+    // postaviti u listu rezultate(punjenje liste)
+    private List<String> load(String file_name) throws FileNotFoundException {
+        File file = new File(file_name);
+
+        if (!file.exists()) {
+            //ako ne postoji datotetka, izbaci izuzetak
+            throw new FileNotFoundException();
+        }
+
+        List<String> scores = new ArrayList<>();
+
+        try (Scanner scanner = new Scanner(file)) { //kreiranje citaoca koji unosi podatke
+            while (scanner.hasNextLine()) {
+                scores.add(scanner.nextLine()); //postavljanje rezultata u listu
+
+            }
+        }
+
+        return scores;
+    }
+
+    public static void readTextFileLineByLine() {
+        FileReader in = null;
+        //BufferedReader dozvoljava čitanje većeg "komada" datoteke odjednom.
+        BufferedReader bin = null;
+
+        try {
+
+            File file = new File("src/snake/results.txt");
+
+            in = new FileReader(file);
+            // Za inicijalizaciju, BufferedReader zahtjeva otvoren FileReader tok
+            bin = new BufferedReader(in);
+
+            String data;
+            ArrayList<String> rijeci = new ArrayList<>();
+
+            /*
+             * Metoda readLine klase BufferedReader učitava jedan red teksta iz
+             * datoteke. Vraća null ukoliko dođe do kraja datoteke.
+             */
+            while ((data = bin.readLine()) != null) {
+                rijeci.add(data);
+            }
+
+            int d = rijeci.size();
+
+            String strLine = "";
+
+            for (int i = 0; i < d; i++) {
+                strLine += (i + 1) + ". " + rijeci.get(i) + "\n";
+            }
+            JOptionPane.showMessageDialog(null, strLine, "Scores", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        } finally {
+            if (bin != null) {
+                try {
+                    bin.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
+            }
+
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
+            }
+        }
     }
 
     class GameKeyAdapter extends KeyAdapter {

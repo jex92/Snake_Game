@@ -36,6 +36,7 @@ public class Frame extends JFrame {
         // Napravimo stavku za meni
         JMenuItem newGame = new JMenuItem("New game");
         JMenuItem Help = new JMenuItem("Help");
+        JMenuItem Scores = new JMenuItem("Scores");
 
         newGame.addActionListener(new ActionListener() {
 
@@ -52,10 +53,20 @@ public class Frame extends JFrame {
                 board.help.setVisible(true);
             }
         });
+        
+        Scores.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                board.readTextFileLineByLine();
+            }
+        });
 
         // Dodamo stavku u meni
         gameMenu.add(newGame);
+        gameMenu.add(Scores);
         gameMenu.add(Help);
+
         // Dodamo meni u liniju menija
         menuBar.add(gameMenu);
 

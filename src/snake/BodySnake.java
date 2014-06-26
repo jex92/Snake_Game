@@ -8,31 +8,22 @@ import java.util.LinkedList;
 
 public class BodySnake implements GameObject {
 
-    private final Board board;
-
-    public static int s = 20;
-
-    LinkedList<Rectangle> snake = new LinkedList();
-    int body;
-    int STEP = 3;
-
-    MovingState realMovingState;
-    MovingState usersLastMovingState;
+    private Board board;
 
     int xHead;
     int yHead;
     int x;
     int y;
+    int s = 20;
+    int body;
+
+    LinkedList<Rectangle> snake = new LinkedList();
+
+    MovingState realMovingState;
+    MovingState usersLastMovingState;
 
     /**
      * Metoda koja povećava telo zmije za jedan pravougaonik.
-     */
-    void grow() {
-        body++;
-    }
-
-    /**
-     * Posebna vrsta Java klase. Sadrži 4 konstante.
      */
     enum MovingState {
 
@@ -54,8 +45,14 @@ public class BodySnake implements GameObject {
         this.usersLastMovingState = MovingState.MOVING_RIGHT;
     }
 
+    void grow() {
+        body++;
+    }
+
     /**
-     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_RIGHT;
+     * Metoda koja postavlja usersLastMovingState = MovingState.MOVING_RIGHT gde
+     * je usersLastMovingState što korisnik želi, tj. u kom smeru želi da se
+     * zmija kreće, dok je realMovingState stvarno kretanje zmije.
      */
     public void moveRight() {
         usersLastMovingState = MovingState.MOVING_RIGHT;
@@ -83,7 +80,8 @@ public class BodySnake implements GameObject {
     }
 
     /**
-     * Metoda koja boji našu zmiju u CYAN (svetlo plavu) boju.
+     * Metoda koja boji našu zmiju, pravougaonik po pravougaonik, u CYAN (svetlo
+     * plavu) boju.
      */
     @Override
     public void draw(Graphics2D g2) {
@@ -95,10 +93,9 @@ public class BodySnake implements GameObject {
     }
 
     /**
-     * Metoda koja ispituje kada može biti realMovingState =
-     * usersLastMovingState. i * Kada je to ispunjeno ispituje se kakav je
-     * status realMovingState * i u zavisnosti od tog stanja implementira se
-     * kretanje zmije.
+     * Metoda koja ispituje kada realMovingState postaje usersLastMovingState.
+     * Zatim ispituje se kakav je status realMovingState i u zavisnosti od tog
+     * stanja implementira se kretanje zmije.
      */
     @Override
     public void move() {
@@ -181,7 +178,7 @@ public class BodySnake implements GameObject {
     void hitItself() {
         for (int i = 1; i < snake.size(); i++) {
             if (snake.getFirst().intersects(snake.get(i))) {
-                board.stopGame("Game over");
+                board.stopGame();
             }
         }
     }

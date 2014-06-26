@@ -25,7 +25,7 @@ public class HelpFrame extends javax.swing.JFrame {
         buttonHelpAbout = new javax.swing.JLabel();
         buttonCloseHelp = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(0, 0, 0));
         setForeground(new java.awt.Color(0, 0, 0));
 
